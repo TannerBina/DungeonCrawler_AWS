@@ -19,10 +19,18 @@ public class Server implements Runnable{
 	//the server thread
 	private Thread thread;
 
+	//context for holding list of all games
+	private Context gamesContext;
+	private Vector<Game> gameList;
+	private Set<String> idSet;
+
+	//list of all clients
 	private Vector<Client> clients;
 
 	//private constructor
-	private Server(){clients = new Vector<>();}
+	private Server(){
+		clients = new Vector<>();
+		idSet = new HashSet<>();}
 
 	//static instance fetcher for the server
 	public static Server getInstance(){
@@ -62,16 +70,75 @@ public class Server implements Runnable{
 
 	/*
 	Handles a sent string from a client
+	The only strings this should handle are create
+	and join game commands from clients
+	all other strings are sent to the specific
+	clients game for it to handle
 	 */
 	public synchronized void handle(String s, Client client){
-		
+		//if client is in a game, send to game to handle
+		if (client.getGame() != null){
+			client.getGame().sendMessage(s, client);
+			return;
+		}
+
+		//otherwise get the command
+		Util.FullCommand cmd = new Util.FullCommand(s, gamesContext);
+
+		//switch off command
+		switch(cmd.command){
+			case NULL:
+			System.err.println("NULL Command passed into Server : " + s);
+			break;
+
+			//if create game, add to game context, make game and add client
+			case CREATEGAME:
+			gamesContext.put(Util.ParamType.SYSTEM, cmd.params.get(0));
+			gameList.add(new Game(cmd.params.get(0)));
+			gameList.get(gameList.size()-1).addClient(client);
+			break;
+
+			//if join just add client
+			case JOINGAME:
+			Game g = findGame(cmd.params.get(0));
+			if (g != null) g.addClient(client);
+			else System.err.println("Could not find Game : " + s);
+			break;
+
+			default:
+			System.err.println("Command not recognized : " + s);
+			break;
+		}
+	}
+
+	//finds the given game in the gamelist
+	private Game findGame(String s) {
+		for (Game g : gameList){
+			if (g.getName().equals(s)){
+				return g;
+			}
+		}
+		return null;
 	}
 
 	/*
 	Adds a client with the given socket to the list
 	 */
-	private void addClient(Socket socket){
-		clients.add(new Client(socket, this));
+	private synchronized void addClient(Socket socket){
+		clients.add(new Client(socket, this, genID()));
+	}
+
+	/*
+	Generates an id that has not been used
+	and adds it to the lsit of ids
+	 */
+	private synchronized String genID(){
+		String check = UUID.randomUUID().toString();
+		while(idSet.contains(check)){
+			check = UUID.randomUUID().toString();
+		}
+		idSet.add(check);
+		return check;
 	}
 
 	/*

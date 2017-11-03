@@ -14,6 +14,7 @@ public class Context {
 
 	//empty constructor for a context
 	public Context(){
+		contextMap = new HashMap<>();
 		//init the context map
 		for (int i = 0; i < Util.ParamType.NONE.ordinal(); i++){
 			contextMap.put(i, new ArrayList<>());
@@ -26,7 +27,10 @@ public class Context {
 	}
 
 	//places a specified id string in the context list
+	//In id formate (uppercase without spaces)
 	public void put(Util.ParamType type, String data){
-		contextMap.get(type.ordinal()).add(data);
+		//makes sure the data entered is in upper case format as 
+		//all parameter info is, also remvoes spaces
+		contextMap.get(type.ordinal()).add(data.toUpperCase().replace(" ", ""));
 	}
 }

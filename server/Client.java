@@ -5,7 +5,9 @@ import java.net.*;
 Client class for sending messages from server
 to the client and server receiving messages
  */
-public class Client extends Thread {
+public class Client extends Thread implements Comparable<Client> {
+	//a given clients id
+	private String id;
 	//the socket for communication
 	private Socket socket;
 	//reference to the server from the client
@@ -14,15 +16,23 @@ public class Client extends Thread {
 	private BufferedReader reader;
 	private PrintWriter sender;
 
+	//the game this client is currently in
+	private Game game;
+
+	//flag for whether or not the client is a dm
+	private boolean dm;
+
 	/*
 	Creates the client from the socket
 	that is inputted
 	 */
-	public Client(Socket socket, Server server){
+	public Client(Socket socket, Server server, String id){
 		super();
 		//set the socket and attempt to open it
 		this.socket = socket;
 		this.server = server;
+		this.id = id;
+		dm = false;
 		try{
 			open();
 			start();
@@ -42,8 +52,19 @@ public class Client extends Thread {
 		}
 	}
 
+	//checks if the client is a dm
+	public boolean isDM(){return dm;}
+
+	//sets the game this client is in
+	public void setGame(Game g){
+		game = g;
+	}
+
+	//returns the game the client is in
+	public Game getGame(){return game;}
+
 	/*
-	Sends the nputted string across the writer to the client
+	Sends the inputted string across the writer to the client
 	 */
 	public void send(String s){
 		sender.write(s + '\n');
@@ -65,5 +86,13 @@ public class Client extends Thread {
 		reader.close();
 		sender.close();
 		socket.close();
+	}
+
+	public int compareTo(Client other){
+		return id.compareTo(other.id);
+	}
+
+	public boolean equals(Client other){
+		return id.equals(other.id);
 	}
 }

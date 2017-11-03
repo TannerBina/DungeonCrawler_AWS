@@ -25,15 +25,16 @@ public class Util{
 	0 represents an infinite number
 	 */
 	public enum Command {
-		NULL(0, ParamType.NONE),
-		CREATEGAME(1, ParamType.SYSTEM),
-		JOINGAME(1, ParamType.SYSTEM);
+		NULL(0, new ParamType[]{}),
+		//note that empty paramtypes imply only 1 param
+		CREATEGAME(1, new ParamType[]{}),
+		JOINGAME(1, new ParamType[]{ParamType.SYSTEM});
 
 		public final int numParams;
-		public final ParamType type;
-		Command(int numParams, ParamType type){
+		public final ParamType[] types;
+		Command(int numParams, ParamType[] types){
 			this.numParams = numParams;
-			this.type = type;
+			this.types = types;
 		}
 	};
 
@@ -56,55 +57,74 @@ public class Util{
 		//creates a full command off the given data and context,
 		//returns a NULL command if command is unrecognized
 		public FullCommand(String data, Context context){
+			params = new ArrayList<>();
 			//set data to uppercase and remove spaces
 			data = data.toUpperCase().replace(" ", "");
 			//build the string from substring without $
 			StringBuilder sb = new StringBuilder(data.substring(1, data.length()));
 
 			command = getCommand(sb);
+
+			//if the command is null or has no parameters return
+			if (command == Command.NULL || command.numParams == 0){
+				return;
+			}
+
+			//if there are no param types, assume 1 param
+			//and fill with all remaining info
+			if (command.types.length == 0 || context == null){
+				params.add(sb.toString());
+				return;
+			}
+
+			//loop through each parameter, adding it to the list
+			for (int i = 0; i < command.numParams; i++){
+				params.add(getParam(sb, context.get(command.types[i])));
+			}
 		}
 
-		//gets the command part of the inputted data
-		//removes the command from the inputted string as well
-		//returns NULL if command not recognized
-		private static Command getCommand(StringBuilder data){
+		//gets the parameter from the inputted list of params
+		//removes the parameter from data string
+		//return "NULL" string if no parameter
+		private static String getParam(StringBuilder data, ArrayList<String> params){
 			int endIndex = 0;
 			int minDif = Integer.MAX_VALUE;
-			Command min = Command.NULL;
-			//settup invalid command array
-			ArrayList<Command> invalid = new ArrayList<>();
-			//loops through each possible size of a command
+			String min = "NULL";
+			//settup invalid string array
+			ArrayList<String> invalid = new ArrayList<>();
+			//loops through each possible size of a string
 			for (int i = 1; i < data.length()+1; i++){
-				//get the substring of the current size
+				//get substring of current size
 				String sub = data.toString().substring(0, i);
-				//calc the max difference possible for two strings to be valud
-				int maxDif = (int)(sub.length() * DIST_THRESHHOLD +.99);
-				//loop through commands
-				for (Command c : Command.values()){
-					if (c == Command.NULL || invalid.contains(c)) continue;
+				//calc the max dif possible for two strings to be valid
+				int maxDif = (int)(sub.length() * DIST_THRESHHOLD + .99);
+				//loop through strings
+				for (String s : params){
+					if (s == "NULL" || invalid.contains(s)) continue;
 					//get difference in length
-					int lengthDif = Math.abs(c.name().length() - sub.length());
-					//dont check if lengthdif auto disqualifies
+					int lengthDif = Math.abs(s.length() - sub.length());
+					//check if falls within possible bounds
 					if (lengthDif < minDif && lengthDif <= maxDif){
-						//get distance
-						int dif = distance(c.name(), sub);
-						//if perfect match return immediately.
-						if (dif == 0){ 
+						//get difference
+						int dif = distance(s, sub);
+						//return if perfect match
+						if (dif == 0){
 							data.delete(0, i);
-							return c;
+							return s;
 						}
+
 						//otherwise if it falls within accepted bound
 						//set values
-						if (dif < minDif && dif <= maxDif){
+						if (dif <= minDif && dif <= maxDif){
 							endIndex = i;
 							minDif = dif;
-							min = c;
+							min = s;
 						}
 
 						//if the dif is ever greater than max dif + lengthDif,
 						//set as invalid as cannot be command
 						if (dif > maxDif+lengthDif){
-							invalid.add(c);
+							invalid.add(s);
 						}
 					}
 				}
@@ -113,6 +133,18 @@ public class Util{
 			//delete section and return
 			data.delete(0, endIndex);
 			return min;
+		}
+
+		//gets the command part of the inputted data
+		//removes the command from the inputted string as well
+		//returns NULL if command not recognized
+		private static Command getCommand(StringBuilder data){
+			ArrayList<String> commandOpts = new ArrayList<>();
+			for (Command c : Command.values()){
+				commandOpts.add(c.name());
+			}
+			String res = getParam(data, commandOpts);
+			return Command.valueOf(res);
 		}
 	}
 
