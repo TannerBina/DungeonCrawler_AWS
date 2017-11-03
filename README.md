@@ -4,5 +4,4 @@ Future development should lead to a full more advanced and secure form of the or
 
 Extremely Limited Current State.
 
-Only contains login function.
 Code under constant production.
