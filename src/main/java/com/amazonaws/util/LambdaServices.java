@@ -29,6 +29,11 @@ public class LambdaServices {
 			LambdaInvokerFactory.builder().lambdaClient(AWSLambdaClientBuilder
 					.defaultClient()).build(DeleteCharacterService.class);
 	
+	//init and build create game service
+	private final static CreateGameService createGameService =
+			LambdaInvokerFactory.builder().lambdaClient(AWSLambdaClientBuilder
+					.defaultClient()).build(CreateGameService.class);
+	
 	/*
 	 * Calls the login_function
 	 */
@@ -55,5 +60,12 @@ public class LambdaServices {
 	 */
 	public static Output deleteCharacter(DeleteCharacterInput in) {
 		return deleteCharacterService.deleteCharacter(in);
+	}
+	
+	/*
+	 * Calls the create_game_function
+	 */
+	public static Output createGame(CreateGameInput in) {
+		return createGameService.createGame(in);
 	}
 }

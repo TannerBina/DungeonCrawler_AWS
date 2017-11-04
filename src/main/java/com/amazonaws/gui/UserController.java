@@ -132,7 +132,7 @@ public class UserController {
 	 */
 	@FXML
 	public void handleBtnHostGame() {
-
+		naviToNew(btnHostGame, Constants.WIN_CREATE_GAME);
 	}
 
 	/*
@@ -225,6 +225,8 @@ public class UserController {
 	private Button btnLogOut;
 	@FXML
 	private Button btnCreateNewCharacter;
+	@FXML
+	private Button btnHostGame;
 
 	@FXML
 	private TableView<GameDisplayer> tblGameList;

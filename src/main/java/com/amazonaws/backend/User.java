@@ -18,8 +18,13 @@ public class User {
 	//the static reference to user
 	private static User user = null;
 	
+	//username and password of the user
 	private String username;
 	private String password;
+	
+	//the client for communication with the
+	//server
+	private Client client;
 	
 	//all characters that the user has access to.
 	private ArrayList<Character> characters;
@@ -103,5 +108,17 @@ public class User {
 
 	public void reset() {
 		user = new User();
+	}
+
+	/*
+	 * Connects to the server and creates a game
+	 * within the server in which this player is the dungeon
+	 * master
+	 */
+	public void createGame(String text) {
+		client = new Client();
+		if (client.isActive()) {
+			
+		}
 	}
 }

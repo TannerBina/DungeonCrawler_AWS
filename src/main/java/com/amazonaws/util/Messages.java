@@ -15,7 +15,8 @@ public class Messages {
 		PASSWORD_MATCH, USERNAME_EXISTS, USERNAME_TOO_SHORT,
 		PASSWORD_TOO_SHORT, USERNAME_TOO_LONG, PASSWORD_TOO_LONG,
 		INCORRECT_PARAMETERS, INCORRECT_PASSWORD, INCORRECT_USERNAME,
-		CHARACTER_DOES_NOT_EXIST
+		CHARACTER_DOES_NOT_EXIST, GAME_NAME_EXISTS, GAME_NAME_TOO_LONG,
+		GAME_NAME_TOO_SHORT
 	}
 	
 	public static final String[] ERR_MESSAGES = {
@@ -28,7 +29,11 @@ public class Messages {
 		"INCORRECT PARAMS : CODING ERROR : PLEASE REPORT TO tanner.bina@richmond.edu",
 		"Incorrect password",
 		"Username does not exist",
-		"Character does not exist"
+		"Character does not exist",
+		"Game name already exists",
+		"Game name too long (5-25)",
+		"Game name too short (5-25)"
+		
 	};
 	
 	//enum of success messages that can be returned

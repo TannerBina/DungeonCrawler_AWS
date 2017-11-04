@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.amazonaws.gui.GameCreateController">
+   <children>
+      <Button fx:id="btnHostGame" layoutX="261.0" layoutY="347.0" mnemonicParsing="false" onAction="#handleBtnHostGame" prefWidth="125.0" text="Host Game" />
+      <Button fx:id="btnBack" layoutX="14.0" layoutY="347.0" mnemonicParsing="false" onAction="#handleBtnBack" prefWidth="125.0" text="Back" />
+      <TextField fx:id="tfGameName" layoutX="72.0" layoutY="109.0" prefHeight="39.0" prefWidth="257.0" promptText="Enter Game Name" />
+      <TextField fx:id="tfGamePassword" layoutX="72.0" layoutY="181.0" prefHeight="39.0" prefWidth="257.0" promptText="Enter Game Password (5-25)" />
+      <Label fx:id="lblError" layoutX="72.0" layoutY="248.0" textFill="RED" />
+   </children>
+</AnchorPane>

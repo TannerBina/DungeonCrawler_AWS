@@ -7,6 +7,7 @@ public class Constants {
 	
 	public static final String WIN_USER = "userWin.fxml";
 	public static final String WIN_LOGIN = "loginWin.fxml";
+	public static final String WIN_CREATE_GAME = "createGameWin.fxml";
 	
 	public static final String[] WINS_CREATE_CHAR = {
 		"nameWin.fxml", "raceWin.fxml", "classWin.fxml",
