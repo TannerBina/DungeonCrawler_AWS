@@ -30,7 +30,10 @@ public class Server implements Runnable{
 	//private constructor
 	private Server(){
 		clients = new Vector<>();
-		idSet = new HashSet<>();}
+		idSet = new HashSet<>();
+		gameList = new Vector<>();
+		gamesContext = new Context();
+	}
 
 	//static instance fetcher for the server
 	public static Server getInstance(){
@@ -61,6 +64,7 @@ public class Server implements Runnable{
 		while(thread != null){
 			try{
 				addClient(serverSocket.accept());
+				System.out.println("Client succesfully Added");
 			} catch (IOException e){
 				System.err.println("Server accept error.");
 				stop();
@@ -95,7 +99,9 @@ public class Server implements Runnable{
 			case CREATEGAME:
 			gamesContext.put(Util.ParamType.SYSTEM, cmd.params.get(0));
 			gameList.add(new Game(cmd.params.get(0)));
+			client.setDM(true);
 			gameList.get(gameList.size()-1).addClient(client);
+			System.out.println("Game created for : " + client.getID());
 			break;
 
 			//if join just add client

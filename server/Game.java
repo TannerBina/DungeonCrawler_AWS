@@ -14,7 +14,7 @@ public class Game implements Runnable, Comparable<Game>{
 		public String message;
 		public Client client;
 		public GameMessage(String message, Client client){
-			this.message = message;
+			this.message = message.trim();
 			this.client = client;
 		}
 	}
@@ -55,7 +55,19 @@ public class Game implements Runnable, Comparable<Game>{
 
 	//TODO implement handle method
 	public void handle(GameMessage m){
+		if (m.message.charAt(0) == '$'){
 
+		} else {
+			sendToAll(m.message);
+		}
+	}
+
+	//Send a message to every client who is linked
+	//to the game
+	public void sendToAll(String m){
+		for (Client c : clients){
+			c.send(m);
+		}
 	}
 
 	//adds a entered client to this game

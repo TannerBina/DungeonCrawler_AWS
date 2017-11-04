@@ -22,6 +22,8 @@ public class Client extends Thread implements Comparable<Client> {
 	//flag for whether or not the client is a dm
 	private boolean dm;
 
+	private boolean active;
+
 	/*
 	Creates the client from the socket
 	that is inputted
@@ -33,6 +35,7 @@ public class Client extends Thread implements Comparable<Client> {
 		this.server = server;
 		this.id = id;
 		dm = false;
+		active = false;
 		try{
 			open();
 			start();
@@ -42,7 +45,7 @@ public class Client extends Thread implements Comparable<Client> {
 	}
 
 	public void run(){
-		while(true){
+		while(active){
 			try{
 				server.handle(reader.readLine(), this);
 			} catch(IOException e){
@@ -50,6 +53,14 @@ public class Client extends Thread implements Comparable<Client> {
 				server.remove(this);
 			}
 		}
+	}
+
+	//gets the id of the client
+	public String getID(){return id;}
+
+	//sets whether the client is a dm
+	public void setDM(boolean b){
+		dm = b;
 	}
 
 	//checks if the client is a dm
@@ -77,6 +88,7 @@ public class Client extends Thread implements Comparable<Client> {
 	private void open() throws IOException{
 		reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         sender = new PrintWriter(socket.getOutputStream());
+     	active = true;
 	}
 
 	/*
@@ -86,6 +98,7 @@ public class Client extends Thread implements Comparable<Client> {
 		reader.close();
 		sender.close();
 		socket.close();
+		active = false;
 	}
 
 	public int compareTo(Client other){

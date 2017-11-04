@@ -1,3 +1,5 @@
+import java.net.*;
+import java.io.*;
 /*
 A test class used for testing different code sections
  */
@@ -32,5 +34,38 @@ public class Test {
 			System.out.println();
 		}
 		System.out.println("Finished Testing Util FullCommand Param Fetch");
+
+		System.out.println();
+		System.out.println();
+
+		System.out.println("Testing Server Connections");
+		Server.getInstance().startServer();
+		try{
+			String hostAddress = InetAddress.getLocalHost().getHostAddress();
+			System.out.println();
+			System.out.printf("Host address : %s\n", hostAddress);
+
+			Socket s = new Socket(hostAddress, 5000);
+
+			PrintWriter pw = new PrintWriter(s.getOutputStream());
+			System.out.println();
+			pw.write("This string input\n");
+			pw.flush();
+			pw.write("$joingame thatOneGame\n");
+			pw.flush();
+			pw.write("$creategame supergame\n");
+			pw.flush();
+		} catch (IOException e){
+			System.out.println("Connection Failure");
+		}
+		try{
+			Thread.sleep(1000);
+		} catch (Exception e){
+			System.err.println("Failed to sleep in test.");
+		}
+
+		System.out.println();
+
+		System.out.println("Finished Testing Server Connections");
 	}
 }
