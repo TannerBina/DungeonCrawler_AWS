@@ -5,3 +5,7 @@ Future development should lead to a full more advanced and secure form of the or
 Extremely Limited Current State.
 
 Code under constant production.
+
+11/4/2017
+Pleased to announce that the ec2 server is now up and running!
+Connections can be made and we are on our way to game hosting!
