@@ -3,6 +3,7 @@ package com.amazonaws.backend;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import com.amazonaws.lambdafunction.callers.DeleteGameInput;
 import com.amazonaws.lambdafunction.callers.FetchCharacterInput;
 import com.amazonaws.lambdafunction.callers.Output;
 import com.amazonaws.util.Constants;
@@ -26,6 +27,11 @@ public class User {
 	//server
 	private Client client;
 	
+	//the game that the user is currently in
+	private Game game;
+	//tag for whether the player is the dm of a game
+	private boolean dm;
+	
 	//all characters that the user has access to.
 	private ArrayList<Character> characters;
 	
@@ -38,6 +44,7 @@ public class User {
 		return user;
 	}
 	
+	//Set the credentials used for the user to login
 	public void setCredentials(String username, String password) {
 		this.username = username;
 		this.password = password;
@@ -107,6 +114,7 @@ public class User {
 	}
 
 	public void reset() {
+		close();
 		user = new User();
 	}
 
@@ -115,10 +123,43 @@ public class User {
 	 * within the server in which this player is the dungeon
 	 * master
 	 */
-	public void createGame(String text) {
+	public void createGame(String text, String password) {
 		client = new Client();
 		if (client.isActive()) {
-			
+			client.send("$CREATEGAME " + text);
+			game = new Game(text, password);
+			dm = true;
+		} else {
+			System.err.println("Error Activiating Client in User.createGame");
 		}
+	}
+
+	/*
+	 * A method for whenever the program is about to exit
+	 * insures that all necessary actions are taken
+	 */
+	public void close() {
+		//if user is dm of a game, need to close the game
+		if (game != null && dm) {
+			DeleteGameInput in = new DeleteGameInput();
+			in.setName(game.getName());
+			LambdaServices.deleteGame(in);
+		}
+	}
+	
+	public boolean isDm() {
+		return dm;
+	}
+
+	public void setDm(boolean dm) {
+		this.dm = dm;
+	}
+
+	public Game getGame() {
+		return game;
+	}
+
+	public void setGame(Game game) {
+		this.game = game;
 	}
 }

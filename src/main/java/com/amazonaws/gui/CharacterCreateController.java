@@ -4,14 +4,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.amazonaws.backend.User;
 import com.amazonaws.util.Constants;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /*
  * A controller for all pages related to creating a character.
@@ -164,7 +167,13 @@ public class CharacterCreateController {
             stage.centerOnScreen();
             stage.setResizable(false);
             stage.sizeToScene();
-            stage.setOnCloseRequest(event -> System.exit(0));
+            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            	@Override
+            	public void handle(WindowEvent t) {
+            		User.getInstance().close();
+            		System.exit(0);
+            	}
+            });
             stage.show();
         } catch (IOException e){
             e.printStackTrace();

@@ -11,6 +11,7 @@ import com.amazonaws.util.Constants;
 import com.amazonaws.util.LambdaServices;
 import com.amazonaws.util.Messages;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /*
  * Controls loginWin
@@ -126,7 +128,13 @@ public class LoginController {
             stage.centerOnScreen();
             stage.setResizable(false);
             stage.sizeToScene();
-            stage.setOnCloseRequest(event -> System.exit(0));
+            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            	@Override
+            	public void handle(WindowEvent t) {
+            		User.getInstance().close();
+            		System.exit(0);
+            	}
+            });
             stage.show();
         } catch (IOException e){
             e.printStackTrace();

@@ -38,7 +38,9 @@ public class Messages {
 	
 	//enum of success messages that can be returned
 	public enum Success{
-		CREATE_SUCCESS, LOGIN_SUCCESS, CHARACTER_FETCHED
+		CREATE_SUCCESS, LOGIN_SUCCESS, CHARACTER_FETCHED,
+		CHARACTER_DELETED, GAME_DELETED, GAME_CREATED,
+		GAMES_FETCHED
 	}
 	
 	//the tags for a success and error message

@@ -2,6 +2,7 @@ package com.amazonaws.gui;
 
 import com.amazonaws.backend.User;
 import com.amazonaws.lambdafunction.callers.DeleteCharacterInput;
+import com.amazonaws.lambdafunction.callers.FetchAllGamesInput;
 import com.amazonaws.lambdafunction.callers.Output;
 import com.amazonaws.util.Constants;
 import com.amazonaws.util.LambdaServices;
@@ -17,6 +18,7 @@ import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -29,6 +31,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /*
  * A controller for the page UserWin.fxml
@@ -49,23 +52,10 @@ public class UserController {
 		tcRace.setCellValueFactory(new PropertyValueFactory<CharacterDisplayer, String>("race"));
 		tcLevel.setCellValueFactory(new PropertyValueFactory<CharacterDisplayer, String>("level"));
 
-		tcGameName.setCellValueFactory(new PropertyValueFactory<GameDisplayer, String>("gameName"));
+		tcGameName.setCellValueFactory(new PropertyValueFactory<GameDisplayer, String>("name"));
 		tcUsername.setCellValueFactory(new PropertyValueFactory<GameDisplayer, String>("username"));
 
 		updateCharacterTable();
-
-		updateGameTable = new Timer();
-		updateGameTable.scheduleAtFixedRate(
-				new TimerTask() {
-					@Override
-					public void run() {
-						Platform.runLater( new Runnable() {
-							public void run() {
-								updateGameTable();
-							}
-						});
-					}
-				}, 0, 100);
 		
 		updateGameTable();
 		
@@ -80,6 +70,40 @@ public class UserController {
 		ObservableList<String> gameOptions = FXCollections.observableArrayList();
 		gameOptions.add("Select Game");
 		ObservableList<GameDisplayer> gameData = FXCollections.observableArrayList();
+		
+		//fetch all games
+		Output out = LambdaServices.fetchAllGames(new FetchAllGamesInput());
+		String games = out.getData();
+		
+		//if there are games
+		if (!games.equals("__NO_GAMES__")) {
+			//start scanning through games
+			Scanner s = new Scanner(games);
+			s.useDelimiter(Constants.LAMBDA_DELIMINATOR);
+			
+			//scan through games
+			while(s.hasNext()) {
+				//if it is a game declaration, define and add
+				if (s.next().equals("GAME")) {
+					//scan game info
+					String gameInfo = s.next();
+					Scanner s2 = new Scanner(gameInfo);
+					s2.useDelimiter("_");
+					try {
+						String name = s2.next();
+						String host = s2.next();
+						String password = s2.next();
+						gameData.add(new GameDisplayer(name, host, password));
+						gameOptions.add(name);
+					} catch (Exception e) {
+						System.err.println("Incorrect params in UserController.updateGameTable");
+					}
+					s2.close();
+				}
+			}
+			
+			s.close();
+		}
 		
 		cbGameChooser.setItems(gameOptions);
 		cbGameChooser.getSelectionModel().selectFirst();
@@ -107,6 +131,15 @@ public class UserController {
 		cbCharacterChooser.setItems(characterOptions);
 		cbCharacterChooser.getSelectionModel().selectFirst();
 		tblCharacter.setItems(characterData);
+	}
+	
+	/*
+	 * Handles the refresh game button
+	 * updates the game list to most current
+	 */
+	@FXML
+	public void handleBtnRefreshGames() {
+		updateGameTable();
 	}
 
 	/*
@@ -203,7 +236,13 @@ public class UserController {
             stage.centerOnScreen();
             stage.setResizable(false);
             stage.sizeToScene();
-            stage.setOnCloseRequest(event -> System.exit(0));
+            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            	@Override
+            	public void handle(WindowEvent t) {
+            		User.getInstance().close();
+            		System.exit(0);
+            	}
+            });
             stage.show();
         } catch (IOException e){
             e.printStackTrace();

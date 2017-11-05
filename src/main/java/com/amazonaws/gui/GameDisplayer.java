@@ -5,10 +5,12 @@ import javafx.beans.property.SimpleStringProperty;
 public class GameDisplayer {
 	private SimpleStringProperty name;
 	private SimpleStringProperty username;
+	private String password;
 	
-	public GameDisplayer(String name, String username) {
+	public GameDisplayer(String name, String username, String password) {
 		this.name = new SimpleStringProperty(name);
 		this.username = new SimpleStringProperty(username);
+		this.password = password;
 	}
 
 	public String getName() {
@@ -17,6 +19,10 @@ public class GameDisplayer {
 
 	public String getUsername() {
 		return username.get();
+	}
+	
+	public String getPassword() {
+		return password;
 	}
 	
 	

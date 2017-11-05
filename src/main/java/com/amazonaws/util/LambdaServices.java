@@ -34,6 +34,16 @@ public class LambdaServices {
 			LambdaInvokerFactory.builder().lambdaClient(AWSLambdaClientBuilder
 					.defaultClient()).build(CreateGameService.class);
 	
+	//init and build delete game service
+	private final static DeleteGameService deleteGameService = 
+			LambdaInvokerFactory.builder().lambdaClient(AWSLambdaClientBuilder
+					.defaultClient()).build(DeleteGameService.class);
+	
+	//init and build fetch all games service
+		private final static FetchAllGamesService fetchAllGamesService = 
+				LambdaInvokerFactory.builder().lambdaClient(AWSLambdaClientBuilder
+						.defaultClient()).build(FetchAllGamesService.class);
+	
 	/*
 	 * Calls the login_function
 	 */
@@ -67,5 +77,19 @@ public class LambdaServices {
 	 */
 	public static Output createGame(CreateGameInput in) {
 		return createGameService.createGame(in);
+	}
+	
+	/*
+	 * Calls the delete_game_function
+	 */
+	public static Output deleteGame(DeleteGameInput in) {
+		return deleteGameService.deleteGame(in);
+	}
+	
+	/*
+	 * Calls the fetch_all_games_function
+	 */
+	public static Output fetchAllGames(FetchAllGamesInput in) {
+		return fetchAllGamesService.fetchAllGames(in);
 	}
 }
