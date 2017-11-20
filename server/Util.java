@@ -19,22 +19,29 @@ public class Util{
 		NONE
 	};
 
+	public enum ResponseCommand {
+		SETCHAR, SENDCHAR, ADDCHAR, REMOVECHAR
+	}
+
 	/*
 	A command and the inputted number of 
 	parameters that should follow the command,
 	0 represents an infinite number
 	 */
 	public enum Command {
-		NULL(0, new ParamType[]{}),
+		NULL(0, new ParamType[]{}, false),
 		//note that empty paramtypes imply only 1 param
-		CREATEGAME(1, new ParamType[]{}),
-		JOINGAME(1, new ParamType[]{ParamType.SYSTEM});
+		CREATEGAME(1, new ParamType[]{}, true),
+		JOINGAME(1, new ParamType[]{ParamType.SYSTEM}, false),
+		SETCHAR(2, new ParamType[]{ParamType.SYSTEM}, false);
 
 		public final int numParams;
 		public final ParamType[] types;
-		Command(int numParams, ParamType[] types){
+		public final boolean dmOnly;
+		Command(int numParams, ParamType[] types, boolean dmOnly){
 			this.numParams = numParams;
 			this.types = types;
+			this.dmOnly = dmOnly;
 		}
 	};
 
@@ -60,10 +67,19 @@ public class Util{
 			params = new ArrayList<>();
 			//set data to uppercase and remove spaces
 			data = data.toUpperCase().replace(" ", "");
-			//build the string from substring without $
+			//build the string from substring without $ or @
 			StringBuilder sb = new StringBuilder(data.substring(1, data.length()));
 
 			command = getCommand(sb);
+
+			//if the command is a dmOnly command and does not
+			//come from a dm, return null command
+			if (command.dmOnly){
+				if (data.charAt(0) != '@'){
+					command = Command.NULL;
+					return;
+				}
+			}
 
 			//if the command is null or has no parameters return
 			if (command == Command.NULL || command.numParams == 0){
@@ -79,7 +95,14 @@ public class Util{
 
 			//loop through each parameter, adding it to the list
 			for (int i = 0; i < command.numParams; i++){
-				params.add(getParam(sb, context.get(command.types[i])));
+				//if there is no more types for paramters, assume the rest of the string
+				//is a final parameters
+				if (i >= command.types.length){
+					params.add(sb.toString());
+					return;
+				} else {
+					params.add(getParam(sb, context.get(command.types[i])));
+				}
 			}
 		}
 
@@ -195,5 +218,20 @@ public class Util{
         }
         System.err.println("Could not find minimum of three numbers");
         return 0;
+    }
+
+    /*
+    Gets the proficiency bonus of a class
+    given an entered string containing the level
+    of a character
+     */
+    public static int getProfBonus(String level){
+    	try{
+    		int lvl = Integer.parseInt(level);
+    		return (lvl-1)/4 + 2;
+    	} catch(Exception e){
+    		System.out.println("ERROR : Not int in level for Util.getProfBonus : level");
+    		return -1;
+    	}
     }
 }

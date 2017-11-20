@@ -22,7 +22,11 @@ public class Client extends Thread implements Comparable<Client> {
 	//flag for whether or not the client is a dm
 	private boolean dm;
 
+	//whetehr the client is active or not
 	private boolean active;
+
+	//the character who this client belongs to.
+	private Character character;
 
 	/*
 	Creates the client from the socket
@@ -55,6 +59,10 @@ public class Client extends Thread implements Comparable<Client> {
 		}
 	}
 
+	//set and get character
+	public void setCharacter(Character character){this.character = character;}
+	public Character getCharacter(){return character;}
+
 	//gets the id of the client
 	public String getID(){return id;}
 
@@ -78,6 +86,9 @@ public class Client extends Thread implements Comparable<Client> {
 	Sends the inputted string across the writer to the client
 	 */
 	public void send(String s){
+		if (Main.DEBUG){
+			System.out.printf("Sending to %s : %s\n", id, s);
+		}
 		sender.write(s + '\n');
 		sender.flush();
 	}
@@ -99,6 +110,10 @@ public class Client extends Thread implements Comparable<Client> {
 		sender.close();
 		socket.close();
 		active = false;
+	}
+
+	public boolean isActive(){
+		return active;
 	}
 
 	public int compareTo(Client other){

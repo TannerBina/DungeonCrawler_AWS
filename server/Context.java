@@ -33,4 +33,10 @@ public class Context {
 		//all parameter info is, also remvoes spaces
 		contextMap.get(type.ordinal()).add(data.toUpperCase().replace(" ", ""));
 	}
+
+	//removes a specified id string in the context list
+	//formats to id format
+	public void remove(Util.ParamType type, String data){
+		contextMap.get(type.ordinal()).remove(data.toUpperCase().replace(" ", ""));
+	}
 }

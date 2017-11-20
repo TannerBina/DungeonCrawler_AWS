@@ -1,6 +1,7 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /*
 The whole server class. Allows creation and joining
@@ -22,6 +23,7 @@ public class Server implements Runnable{
 	//context for holding list of all games
 	private Context gamesContext;
 	private Vector<Game> gameList;
+	private Map<Game, BlockingQueue<Game.GameMessage>> qMap;
 	private Set<String> idSet;
 
 	//list of all clients
@@ -33,6 +35,7 @@ public class Server implements Runnable{
 		idSet = new HashSet<>();
 		gameList = new Vector<>();
 		gamesContext = new Context();
+		qMap = new HashMap<>();
 	}
 
 	//static instance fetcher for the server
@@ -80,10 +83,24 @@ public class Server implements Runnable{
 	clients game for it to handle
 	 */
 	public synchronized void handle(String s, Client client){
+		if (Main.DEBUG) System.out.printf("Server Recieved : %s \n", s);
 		//if client is in a game, send to game to handle
 		if (client.getGame() != null){
-			client.getGame().sendMessage(s, client);
+			
+			if (Main.DEBUG){
+				System.out.printf("Sending to Game %s\n", client.getGame().getName());
+			}
+			Game.GameMessage m = new Game.GameMessage(s, client);
+			try{	
+				qMap.get(client.getGame()).put(m);
+			} catch (InterruptedException e){
+				System.out.println("Interruped in handle of server.");
+			}
 			return;
+		}
+
+		if (Main.DEBUG){
+			System.out.printf("Client not in Game, Handling\n");
 		}
 
 		//otherwise get the command
@@ -98,7 +115,13 @@ public class Server implements Runnable{
 			//if create game, add to game context, make game and add client
 			case CREATEGAME:
 			gamesContext.put(Util.ParamType.SYSTEM, cmd.params.get(0));
-			gameList.add(new Game(cmd.params.get(0)));
+			//settup blocking queue
+			BlockingQueue<Game.GameMessage> q = new LinkedBlockingQueue<>();
+			//create game
+			gameList.add(new Game(cmd.params.get(0), q));
+			//add q to qMap
+			qMap.put(gameList.get(gameList.size()-1), q);
+			//settup client as dm in gamew
 			client.setDM(true);
 			gameList.get(gameList.size()-1).addClient(client);
 			System.out.println("Game created for : " + client.getID());
@@ -139,9 +162,9 @@ public class Server implements Runnable{
 	and adds it to the lsit of ids
 	 */
 	private synchronized String genID(){
-		String check = UUID.randomUUID().toString();
+		String check = UUID.randomUUID().toString().toUpperCase();
 		while(idSet.contains(check)){
-			check = UUID.randomUUID().toString();
+			check = UUID.randomUUID().toString().toUpperCase();
 		}
 		idSet.add(check);
 		return check;
@@ -164,6 +187,14 @@ public class Server implements Runnable{
 		try{
 			client.close();
 			clients.remove(client);
+
+			if (client.isDM()){
+				client.getGame().closeGame();
+				gameList.remove(client.getGame());
+				gamesContext.remove(Util.ParamType.SYSTEM, client.getGame().getName());
+			} else {
+				client.getGame().remove(client);
+			}
 		} catch (IOException e){
 			System.err.println("Error removing client.");
 		}
