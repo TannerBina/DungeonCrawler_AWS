@@ -22,6 +22,11 @@ public class Weapon {
 		this.bonus = bonus;
 		this.finess = finess;
 	}
+	
+	public String toString() {
+		return "__WEAPON__" + name + "_" + dice +
+				"_" + bonus + "_" + finess;
+	}
 
 	/*
 	 * Create a weapon using the Form NAME_DICE_BONUS_FINESS

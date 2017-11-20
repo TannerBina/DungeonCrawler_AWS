@@ -45,7 +45,7 @@
                   <TextField fx:id="tfPassword" layoutX="393.0" layoutY="107.0" prefHeight="39.0" prefWidth="150.0" promptText="Game Password" />
                   
                   <Button fx:id="btnDeleteSelectedCharacter" layoutX="354.0" layoutY="520.0" mnemonicParsing="false" onAction="#handleBtnDeleteSelectedCharacter" prefHeight="39.0" prefWidth="229.0" text="Delete Selected Character" />
-                  <Label fx:id="lblError" layoutX="393.0" layoutY="185.0" textFill="RED" />
+                  <Label fx:id="lblError" layoutX="398.0" layoutY="224.0" textFill="RED" />
                   <Button fx:id="btnRefreshGames" layoutX="393.0" layoutY="185.0" mnemonicParsing="false" onAction="#handleBtnRefreshGames" prefHeight="39.0" prefWidth="150.0" text="Refresh Games" />
                </children>
             </AnchorPane>

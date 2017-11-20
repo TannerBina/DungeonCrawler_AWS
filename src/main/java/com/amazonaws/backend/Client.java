@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import com.amazonaws.util.Constants;
 import com.amazonaws.util.Secret;
 
 /*
@@ -24,7 +25,10 @@ public class Client {
 	
 	public Client() {
 		active = false;
-		connect(Secret.SERVER, Secret.PORT);
+		if (Constants.DEBUG) {
+			connect(Secret.DEBUGSERVER, Secret.PORT);
+		} else
+			connect(Secret.SERVER, Secret.PORT);
 	}
 	
 	/*
@@ -38,9 +42,9 @@ public class Client {
             System.out.println("Connected Successfully.");
 
             //start reading thread and sender
+            active = true;
             listener = new ReadingThread(socket);
             sender = new PrintWriter(socket.getOutputStream());
-            active = true;
         } catch (IOException e){
         	e.printStackTrace();
             System.err.println("Could not connect to Server : " 
@@ -52,6 +56,9 @@ public class Client {
     Send a message to the server
      */
     public void send(String s){
+    	if (Constants.DEBUG) {
+    		System.out.println("Sent : " + s);
+    	}
         sender.print(s + '\n');
         sender.flush();
     }
@@ -60,7 +67,7 @@ public class Client {
      * Caled whenever a message is recieved to handle it
      */
     public void recieve(String s) {
-    	//TODO implement recieve
+    	User.getInstance().handle(s);
     }
     
     /*

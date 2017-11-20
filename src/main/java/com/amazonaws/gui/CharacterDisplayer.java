@@ -1,5 +1,8 @@
 package com.amazonaws.gui;
 
+import com.amazonaws.backend.Character;
+import com.amazonaws.backend.Character.StatTag;
+
 import javafx.beans.property.SimpleStringProperty;
 
 public class CharacterDisplayer {
@@ -7,6 +10,7 @@ public class CharacterDisplayer {
 	private SimpleStringProperty race;
 	private SimpleStringProperty pcClass;
 	private SimpleStringProperty level;
+	private SimpleStringProperty hp;
 	
 	public CharacterDisplayer(String name, String race, 
 			String pcClass, String level) {
@@ -14,6 +18,18 @@ public class CharacterDisplayer {
 		this.race = new SimpleStringProperty(race);
 		this.pcClass = new SimpleStringProperty(pcClass);
 		this.level = new SimpleStringProperty(level);
+	}
+	
+	public CharacterDisplayer(Character c) {
+		this.name = new SimpleStringProperty(c.getStat(StatTag.NAME));
+		this.race = new SimpleStringProperty(c.getStat(StatTag.RACE));
+		this.pcClass = new SimpleStringProperty(c.getStat(StatTag.CLASS));
+		this.level = new SimpleStringProperty(c.getStat(StatTag.LEVEL));
+		this.hp = new SimpleStringProperty(c.getStat(StatTag.CURRENT_HP));
+	}
+	
+	public String getHp() {
+		return hp.get();
 	}
 
 	public String getName() {

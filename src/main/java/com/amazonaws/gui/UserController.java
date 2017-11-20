@@ -12,10 +12,7 @@ import com.amazonaws.backend.Character.StatTag;
 
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -38,8 +35,6 @@ import javafx.stage.WindowEvent;
  * Handles creating games, joining games and picking character
  */
 public class UserController {
-	
-	private Timer updateGameTable;
 
 	/*
 	 * Initaliziation function
@@ -174,7 +169,61 @@ public class UserController {
 	 */
 	@FXML
 	public void handleBtnJoinGame() {
-
+		//get password and gameName
+		String password = tfPassword.getText().toString();
+		String gameName = cbGameChooser.getSelectionModel().getSelectedItem();
+		
+		//check if game selected
+		if (gameName.equals("Select Game")) {
+			lblError.setText("Please select a game.");
+			return;
+		}
+		
+		String charName = cbCharacterChooser.getSelectionModel().getSelectedItem();
+		
+		//check if character selected
+		if (charName.equals("Select Character")) {
+			lblError.setText("Please select a character.");
+			return;
+		}
+		
+		//find selected game
+		GameDisplayer chosen = null;
+		for (GameDisplayer g : tblGameList.getItems()) {
+			if (g.getName().equals(gameName)) {
+				chosen = g;
+			}
+		}
+		
+		//find selected character
+		Character chosenChar = null;
+		for (Character c : User.getInstance().getCharacters()) {
+			if (c.getStat(StatTag.NAME).equals(charName)) {
+				chosenChar = c;
+			}
+		}
+		
+		//make sure game is chosen
+		if (chosen == null) {
+			lblError.setText("Cannot find chosen Game.");
+			return;
+		}
+		
+		//make sure character is chosen
+		if (chosenChar == null) {
+			lblError.setText("Cannot find chosen Character.");
+			return;
+		}
+		
+		//make sure passwords match
+		if (chosen.getPassword().equals(password)) {
+			//join game if match
+			boolean join = User.getInstance().joinGame(chosen.getName(), chosen.getPassword(), chosenChar);
+			if (join) naviToNew(btnJoinGame, Constants.WIN_PLAYER);
+			else lblError.setText("Server Currently Down");
+		} else {
+			lblError.setText("Incorrect Password.");
+		}
 	}
 
 	/*
@@ -266,6 +315,8 @@ public class UserController {
 	private Button btnCreateNewCharacter;
 	@FXML
 	private Button btnHostGame;
+	@FXML
+	private Button btnJoinGame;
 
 	@FXML
 	private TableView<GameDisplayer> tblGameList;

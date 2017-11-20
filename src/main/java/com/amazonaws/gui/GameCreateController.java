@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import com.amazonaws.backend.User;
 import com.amazonaws.lambdafunction.callers.CreateGameInput;
+import com.amazonaws.lambdafunction.callers.DeleteGameInput;
 import com.amazonaws.lambdafunction.callers.Output;
 import com.amazonaws.util.Constants;
 import com.amazonaws.util.LambdaServices;
@@ -41,8 +42,10 @@ public class GameCreateController {
 	public void handleBtnHostGame() {
 		//settup the input with the username, name, password
 		CreateGameInput in = new CreateGameInput();
+		
+		String gameName = tfGameName.getText().toString().replaceAll(" ", "").toUpperCase();
 		//remove spaces from the name
-		in.setName(tfGameName.getText().toString().replaceAll(" ", ""));
+		in.setName(gameName);
 		in.setPassword(tfGamePassword.getText().toString());
 		in.setUsername(User.getInstance().getUsername());
 		
@@ -62,8 +65,14 @@ public class GameCreateController {
 			break;
 			
 		case Messages.SUCCESS_TAG:
-			User.getInstance().createGame(tfGameName.getText().toString()
-					.replaceAll(" ",  ""), tfGamePassword.getText());
+			boolean create = User.getInstance().createGame(gameName, tfGamePassword.getText());
+			if (create) naviToNew(btnHostGame, Constants.WIN_DM);
+			else {
+				lblError.setText("Server Currently Down");
+				DeleteGameInput in1 = new DeleteGameInput();
+				in1.setName(gameName);
+				LambdaServices.deleteGame(in1);
+			}
 			break;
 		}
 		
